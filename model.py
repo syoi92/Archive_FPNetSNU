@@ -56,7 +56,8 @@ class FPNet(object):
 
         self._build_model()
         self.saver = tf.train.Saver() 
-##############################################
+
+
     def _build_model(self):
         self.datasets = tf.placeholder(tf.float32,
                                        [None, self.image_size, self.image_size,

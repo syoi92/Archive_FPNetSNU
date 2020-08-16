@@ -49,13 +49,30 @@ def main(_):
     tfconfig = tf.ConfigProto(allow_soft_placement=True)
     tfconfig.gpu_options.allow_growth = True
 
+    if not args.phase == 'train': # when test phase, automatically setting the configuration of the model
+        model_folder = os.listdir(os.path.join('./checkpoints', args.model_id)
+        model_config = model_folder[0].split('_')
+        args.dataset_dir = model_config[1]
+        args.dataset_dir = model_config[1]
+        args.fine_size = model_config[2]
+        args.scale = model_config[3]
+        args.which_net = model_config[4]
+        args.ngf = model_config[5]
+
+        if not os.path.join('./tests', args.model_id):
+           os.makedirs('./tests', args.model_id)
+
+        './datasets/{}/*.*'.format(self.dataset_dir + '/trainA')
+        
+        print('Model Configuration\n\
+            model_id: {}\ndataset_dir = {}\nimg_size = {}\n\
+                scale = {}\nwhich_net = {}\n# of first filter = {}\n'.format(args.model_id, args.dataset_dir,\ args.fine_size, args.scale, args.which_net, args.ngf))
+
     with tf.Session(config=tfconfig) as sess:
         model = FPNet(sess, args)
         if args.phase == 'train':
             model.train(args)
         else:
-            if not os.path.join('./tests', args.model_id):
-                os.makedirs('./tests', args.model_id)
             model.patch_test(args) if args.use_patch else model.test(args)
 
 if __name__ == '__main__':

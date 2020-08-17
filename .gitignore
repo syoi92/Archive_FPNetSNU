@@ -1,4 +1,3 @@
 ### ignore datasets
 
-
-./datasets/**/*.png
+datasets/**/*.png

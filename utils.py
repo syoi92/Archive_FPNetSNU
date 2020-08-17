@@ -95,7 +95,7 @@ def load_train_patch(image_path, options):
     h_num = int(height / options.image_size / (1-overlapping))
 
     np_A = np.array(img_A).reshape([height, width, 1])
-    np_B = np.zeros([height, width, len(options.output_nc)], dtype=np.float32)
+    np_B = np.zeros([height, width, options.output_nc], dtype=np.float32)
     for it in range(options.output_nc):
         rr, cc = np.where(label_B == it)
         np_B[rr, cc, it] = 1

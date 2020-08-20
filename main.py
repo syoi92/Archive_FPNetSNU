@@ -9,7 +9,6 @@ from model import FPNet, FPNet_StyleLoss
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--dataset_dir', dest='dataset_dir', default='ReScaled2', help='path of the dataset')
 parser.add_argument('--model_id', dest='model_id', default='0000', help='serial number of a model')
-
 parser.add_argument('--epoch', dest='epoch', type=int, default=10, help='# of epoch')
 parser.add_argument('--epoch_step', dest='epoch_step', type=int, default=1, help='# of epoch to decay lr')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=1, help='# images in batch')
@@ -27,15 +26,14 @@ parser.add_argument('--save_freq', dest='save_freq', type=int, default=1000,
                     help='save a model every save_freq iterations')
 parser.add_argument('--print_freq', dest='print_freq', type=int, default=100,
                     help='print the debug information every print_freq iterations')
-# train status
+# model config
 parser.add_argument('--continue_train', dest='continue_train', type=bool, default=False,
-                    help='if continue training, load the latest model: 1: true, 0: false')
+                    help='if continue training, load the latest model: 1: true')
 parser.add_argument('--phase', dest='phase', default='train', help='train, test')
-parser.add_argument('--use_patch', dest='use_patch', type=bool, default=True, help='True when using patch training')
-parser.add_argument('--use_styleloss', dest='use_styleloss', type=bool, default=True, help='True when using GAN')
-# controllable
+parser.add_argument('--use_patch', dest='use_patch', type=int, default=1, help='True when using patch training')
+parser.add_argument('--use_styleloss', dest='use_styleloss', type=int, default=1, help='1: when using GAN, 0: not using')
 parser.add_argument('--which_net', dest='which_net', default='resnet51', help='resnet51 or resnet152')
-parser.add_argument('--style_ratio', dest='style_ratio', type= float, default=10.0, help='ratio of style loss and geometry loss')
+parser.add_argument('--style_ratio', dest='style_ratio', type= float, default=0.03, help='ratio of style loss and geometry loss')
 parser.add_argument('--scale', dest='scale', type= float, default=1, help='scale ratio from 2 mode_gap')
 args = parser.parse_args()
 
@@ -55,33 +53,30 @@ def main(_):
 
     # when test phase, automatically setting the configuration of the model
     if not args.phase == 'train':
-
-       #  model_dir = "GDIsNfDaSc_%s_%s_%s_%s_%s_%s" % \
-                    (args.which_net, self.use_styleloss, self.image_size, args.ngf, self.dataset_dir, self.scale)
-        ######## 여기 고쳐
+        #  model_dir = "GDIsNfDaSc_%s_%s_%s_%s_%s_%s" % \
+        #             (args.which_net, self.use_styleloss, self.image_size, args.ngf, self.dataset_dir, self.scale)
         model_folder = os.listdir(os.path.join('./checkpoints', args.model_id))
         model_config = model_folder[0].split('_')
-        args.dataset_dir = model_config[1]
-        args.fine_size = int(model_config[2])
-        args.scale = int(model_config[3])
-        args.which_net = model_config[4]
-        args.ngf = int(model_config[5])
+        args.which_net = model_config[1]
+        args.use_styleloss = int(model_config[2])
+        args.fine_size = int(model_config[3])
+        args.ngf = int(model_config[4])
+        args.dataset_dir = model_config[5]
+        args.scale = int(model_config[6])
 
         if not os.path.exists(os.path.join('./tests', args.model_id)):
            os.makedirs(os.path.join('./tests', args.model_id))
 
-        './datasets/{}/*.*'.format(args.dataset_dir + '/trainA')
-        
-        print('Model Configuration\nmodel_id: {}\ndataset_dir = {}\nimg_size = {}\n\
-                scale = {}\nwhich_net = {}\n# of first filter = {}\n' \
-              .format(args.model_id, args.dataset_dir,args.fine_size, args.scale, args.which_net, args.ngf))
+        print('Model Configuration\nmodel_id: {}\ndataset_dir = {}\nimg_size = {}'
+              '\nscale = {}\nwhich_net = {}\nuse_styleloss = {}\n# of first filter = {}\n' \
+              .format(args.model_id, args.dataset_dir,args.fine_size, args.scale, args.which_net, args.use_styleloss, args.ngf))
 
     with tf.Session(config=tfconfig) as sess:
-        model = FPNet(sess, args) if not args.use_styleloss else FPNet_StyleLoss(sess, args)
+        model = FPNet(sess, args) if args.use_styleloss == 0 else FPNet_StyleLoss(sess, args)
         if args.phase == 'train':
             model.train(args)
         else:
-            model.patch_test(args) if args.use_patch else model.test(args)
+            model.patch_test(args) if not args.use_patch == 0 else model.test(args)
 
 
 if __name__ == '__main__':

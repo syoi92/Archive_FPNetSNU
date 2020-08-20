@@ -24,7 +24,7 @@ class FPNet(object):
         self.overlapping = args.overlapping
         self.scale = args.scale
         self.is_test = True if args.phase == 'test' else False
-        self.use_patch = args.use_patch
+        self.use_patch = True if args.use_patch == 1 else False
         self.use_styleloss = 1 if args.use_styleloss else 0
 
         if not self.use_patch:
@@ -82,8 +82,8 @@ class FPNet(object):
         tf.add_to_collection('test_logit', self.test_logit)
 
         t_vars = tf.trainable_variables()
-        for var in t_vars:
-            print(var.name)
+        #for var in t_vars:
+        #    print(var.name)
         self.resnet_vars = [var for var in t_vars if 'resnet' in var.name]
 
     def train(self, args):
@@ -108,6 +108,7 @@ class FPNet(object):
         for epoch in range(args.epoch):
             dataA = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/trainA'))
             dataB = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/trainB'))
+
             if not len(dataA) == len(dataB):
                 print('Something wrong. # of img and label are not same')
             dataAB = list(zip(dataA, dataB))
@@ -352,7 +353,8 @@ class FPNet_StyleLoss(object):
         self.overlapping = args.overlapping
         self.scale = args.scale
         self.is_test = True if args.phase == 'test' else False
-        self.use_patch = args.use_patch
+        self.use_patch = True if args.use_patch == 1 else False
+        self.use_styleloss = 1 if not args.use_styleloss == 0 else 0
 
         if not self.use_patch:
             self.load_train_data = load_train_data
@@ -372,8 +374,8 @@ class FPNet_StyleLoss(object):
                                       args.ngf, args.ndf, args.output_nc, args.overlapping, self.label_colors,
                                       args.phase == 'train'))
 
-
-        model_dir = "DIsScMNf_%s_%s_%s_%s_%s" % (self.dataset_dir, self.image_size, self.scale, args.which_net, args.ngf)
+        model_dir = "GDIsNfDaSc_%s_%s_%s_%s_%s_%s" % \
+                    (args.which_net, self.use_styleloss, self.image_size, args.ngf, self.dataset_dir, self.scale)
         self.sample_model_dir = os.path.join('./samples', args.model_id, model_dir)
         if not os.path.exists(self.sample_model_dir):
             os.makedirs(self.sample_model_dir)
@@ -405,7 +407,7 @@ class FPNet_StyleLoss(object):
         # generator_loss
         self.style_loss = sce_criterion(self.DB_fake, tf.ones_like(self.DB_fake))
         self.geo_loss = sce_criterion(self.fake_B, self.labels)
-        self.g_loss = self.style_loss + self.style_ratio * self.geo_loss
+        self.g_loss = self.style_ratio * self.style_loss + self.geo_loss
 
         self.fake_B_sample = tf.placeholder(tf.float32,
                                             [None, self.image_size, self.image_size,
@@ -438,8 +440,8 @@ class FPNet_StyleLoss(object):
         tf.add_to_collection('test_logit', self.test_logit)
 
         t_vars = tf.trainable_variables()
-        for var in t_vars:
-            print(var.name)
+        #for var in t_vars:
+        #    print(var.name)
         self.g_vars = [var for var in t_vars if 'resnet' in var.name]
         self.d_vars = [var for var in t_vars if 'discriminator' in var.name]
 

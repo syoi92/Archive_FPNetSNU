@@ -4,21 +4,21 @@
 ~$CUDA_VISIBLE_DIVICES=0 python main.py --model_id=01 --use_styleloss=0 --scale=0.5
 ```
 
-## fixed parameters for now
+## Fixed parameters for now
 img size = 512
 network architecture = resnet51
-# of firs filters = 64
+number of first filters = 64
 use_patch = True
 
-## Model Comparison
-|model_id|scale(pivot at 2)|style_loss|epoch/epoch_step|
-|:---:|:---:|:---:|:-----:|
-|01||||
+## Models
+| model_id | <p>scale<br>(pivot at 2)</p> | style_loss |<p>epoch<br>epoch_step</p> |
+|:----:|:---:|:---:|:---:|
+|**01**||||
 |||||
-|10|1|x|10/2|
-|11|1|o|10/2|
+|**10**|1|x|<p>10<br>2</p>|
+|**11**|1|o|<p>10<br>2</p>|
 |||||
-|20|0.5|x|40/10|
-|21|0.5|x|40/10|
+|**20**|0.5|x|<p>40<br>10</p>|
+|**21**|0.5|x|<p>40<br>10</p>|
 |||||
 

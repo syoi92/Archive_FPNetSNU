@@ -11,14 +11,24 @@ number of first filters = 64
 use_patch = True
 
 ## Models
-|model_id|<p>scale<br>(pivot at 2)</p>|style_loss|<p>epoch<br>epoch_step</p>|
-|:----:|:---:|:---:|:---:|
-|**01**||||
-|..||||
-|**10**|1|x|10/2|
-|**11**|1|o|10/2|
-|..||||
-|**20**|0.5|x|40/10|
-|**21**|0.5|x|40/10|
-|..||||
+% |model_id|<p>scale<br>(pivot at 2)</p>|style_loss|<p>epoch<br>epoch_step</p>|
+|model_id|description|
+|:----:|---|
+|**01**||
+|..||
+|**1 **|**scale=1/epoch=10/epoch_step=2**|
+|10|default|
+|11|style_loss=0|
+|12|style_ratio=0.03|
+|..||
+|**2 **|**scale=0.5/epoch=40/epoch_step=10**|
+|20|default|
+|21|style_loss=0|
+|22|style_ratio=0.03|
+|..||
+|**3 **|**scale=0.25/epoch=160/epoch_step=40**|
+|30|default|
+|31|style_loss=0|
+|32|style_ratio=0.03|
+
 
